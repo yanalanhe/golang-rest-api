@@ -1,4 +1,4 @@
-package transportHttp
+package http
 
 import (
 	"context"
@@ -8,13 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
-
 	"github.com/gorilla/mux"
 )
-
-type CommentSevice interface {
-
-}
 
 type Handler struct {
 	Router 	*mux.Router
@@ -41,10 +36,15 @@ func(h *Handler) mapRoutes() {
 	h.Router.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello World")
 	})
+
+	h.Router.HandleFunc("/api/v1/comment", h.PostComment).Methods("POST")
+	h.Router.HandleFunc("/api/v1/comment/{id}", h.GetComment).Methods("GET")
+	h.Router.HandleFunc("/api/v1/comment/{id}", h.UpdateComment).Methods("PUT")
+	h.Router.HandleFunc("/api/v1/comment/{id}", h.DeleteComment).Methods("DELETE")
 }
 
 func (h *Handler) Serve() error {
-	// starts the server in non-blocking fasion
+	// start the server in non-blocking fasion
 	go func() {		
 		if err := h.Server.ListenAndServe(); err != nil {
 			log.Println(err.Error())
